@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="br.jpg" type="image/x-icon">
+  <title>HUD Homes – Listings</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== SIDEWAYS SLIDE ANIMATION FOR PAGE CONTENT ===== */
+    @keyframes slideIn {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .slide-hidden {
+      transform: translateX(-100%);
+      opacity: 0;
+      animation: slideIn 0.9s ease-out forwards;
+    }
+
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.5s; }
+    .delay-5 { animation-delay: 0.6s; }
+
+    /* ===== EXTREMELY SMALL / ALMOST INVISIBLE MENU BUTTON ===== */
+    .menu-toggle {
+      position: fixed;
+      top: 5px;
+      left: 5px;
+      z-index: 1001;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.03); /* Almost fully transparent */
+      padding: 2px 4px;
+      font-size: 1px; /* Tiny text */
+      cursor: pointer;
+      outline: none;
+    }
+    .menu-toggle:hover {
+      color: rgba(255,255,255,0.1); /* Slightly visible only on hover */
+    }
+
+    /* ===== HIDDEN SIDEBAR MENU ===== */
+    .sidebar-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 260px;
+      background: rgba(10,10,10,0.95);
+      border-right: 1px solid #39c0e0;
+      padding: 70px 25px 30px;
+      transform: translateX(-100%); /* HIDDEN BY DEFAULT */
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+    }
+
+    .sidebar-menu.active {
+      transform: translateX(0); /* SLIDE IN WHEN OPEN */
+    }
+
+    .sidebar-menu h3 {
+      color: #39c0e0;
+      margin-bottom: 25px;
+      font-style: italic;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+
+    .sidebar-menu a {
+      display: block;
+      color: #ddd;
+      text-decoration: none;
+      padding: 12px 0;
+      font-size: 15px;
+      border-bottom: 1px solid #222;
+      transition: all 0.2s;
+    }
+
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      color: #39c0e0;
+      padding-left: 8px;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ===== HERO SECTION ===== */
+    .hero {
+      min-height: 100vh;
+      padding-top: 20px;
+      background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.65)),
+        url('rip2.jpg') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .logo {
+      width: 160px;
+      margin-bottom: 28px;
+    }
+    .logo img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .headline {
+      font-size: 34px;
+      font-style: italic;
+      font-weight: 800;
+      color: #39c0e0;
+      line-height: 1.25;
+      margin-bottom: 22px;
+    }
+
+    .subtext {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 28px;
+      max-width: 520px;
+      font-family: Luminary, Fantasy;
+    }
+
+    .search-btn {
+      background: #c99a21;
+      color: #fff;
+      border: none;
+      padding: 16px 26px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 22px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .search-btn:hover { background: #b0861d; }
+
+    .small-text {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-bottom: 26px;
+    }
+
+    .cta {
+      background: #19a83e;
+      padding: 16px 34px;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 11px;
+      display: inline-block;
+    }
+    .cta:hover { background: #148a34; }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 480px) {
+      .headline { font-size: 26px; }
+      .search-btn, .cta { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ALMOST INVISIBLE MENU BUTTON -->
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <!-- HIDDEN SIDEBAR MENU -->
+  <div class="sidebar-menu" id="pageMenu">
+    <h3>All Pages</h3>
+    <a href="index.html" class="active">  Home </a>
+    <a href="about.html"> Another offer </a>
+    <a href="how-it-works.html"> opps new offer </a>
+    <a href="locations.html"> check offer </a>
+    <a href="faq.html"> check new </a>
+    <a href="contact.html"> hidden offer </a>
+  </div>
+
+  <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
+
+  <section class="hero">
+    <div class="logo slide-hidden delay-1">
+      <img src="pop.jpg" alt="HUD Homes Logo" />
+    </div>
+
+    <h1 class="headline slide-hidden delay-2">
+       Rent To Own Homes<br />
+    </h1>
+
+    <p class="subtext slide-hidden delay-3">
+        Find Your Dream Home Today
+    </p>
+
+    <a href="https://www.chd93jds.com/CCKTZ52/3QQG7/" class="search-btn slide-hidden delay-4" target="_blank">
+      🔍 SEARCH FOR AVAILABLE HOMES
+    </a>
+
+    <p class="small-text slide-hidden delay-5">
+      View our listings for HUD, Rent To Own Homes and Apartments available in your location
+    </p>
+
+    <a class="cta slide-hidden delay-5" href="https://www.chd93jds.com/CCKTZ52/4B269N/" target="_blank">
+      GET STARTED NOW
+    </a>
+  </section>
+  
+  <footer>
+    <p>&copy; 2026 Rental.Idea. All rights reserved. <br> Powered By DY</p>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('pageMenu');
+      const overlay = document.getElementById('overlay');
+      menu.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+  </script>
+
+</body>
+</html>
